@@ -1,0 +1,9 @@
+streamlit
+transformers
+torch
+spacy
+scispacy
+keybert
+nltk
+pandas
+matplotlib
