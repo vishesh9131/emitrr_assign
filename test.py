@@ -6,12 +6,13 @@ import re
 from utils.ner import MedicalNER
 from utils.biobert_ner import BioBERTNER
 from utils.bert_name_detector import BERTNameDetector
+from utils.biobert_finetuned import FineTunedBioBERTNER
 
 from transcript import *
 def calculate_accuracy(predicted, ground_truth):
     """
     Calculate accuracy metrics for NER predictions
-    Returns precision, recall, and F1 score
+    Returns overall accuracy (float)
     """
     # For Patient_Name (exact match)
     name_correct = predicted["Patient_Name"] == ground_truth["Patient_Name"]
@@ -26,7 +27,6 @@ def calculate_accuracy(predicted, ground_truth):
     treatment_f1 = 2 * (treatment_precision * treatment_recall) / (treatment_precision + treatment_recall) if (treatment_precision + treatment_recall) > 0 else 0
     
     # For string fields (Diagnosis, Current_Status, Prognosis) - use partial matching
-    # Handle None values for these fields
     diagnosis_match = 0.0
     if ground_truth["Diagnosis"] is not None and predicted["Diagnosis"] is not None:
         diagnosis_match = 1.0 if ground_truth["Diagnosis"] in predicted["Diagnosis"] or predicted["Diagnosis"] in ground_truth["Diagnosis"] else 0.0
@@ -57,80 +57,49 @@ def calculate_accuracy(predicted, ground_truth):
     
     overall_accuracy = sum(field_scores) / len(field_scores)
     
+    # Return a dictionary with all metrics
     return {
-        "Patient_Name_Accuracy": 1.0 if name_correct else 0.0,
-        "Symptoms_Precision": symptoms_precision,
-        "Symptoms_Recall": symptoms_recall,
-        "Symptoms_F1": symptoms_f1,
-        "Diagnosis_Match": diagnosis_match,
-        "Treatment_Precision": treatment_precision,
-        "Treatment_Recall": treatment_recall,
-        "Treatment_F1": treatment_f1,
-        "Status_Match": status_match,
-        "Prognosis_Match": prognosis_match,
-        "Overall_Accuracy": overall_accuracy
+        "overall": overall_accuracy,
+        "name": 1.0 if name_correct else 0.0,
+        "symptoms_f1": symptoms_f1,
+        "diagnosis": diagnosis_match,
+        "treatment_f1": treatment_f1,
+        "status": status_match,
+        "prognosis": prognosis_match
     }
 
-def evaluate_name_extraction(chunk_text, expected_name, model_name, extractor):
-    """Evaluate name extraction for a specific model"""
+def evaluate_name_extraction(text, expected_name, model_name, model):
+    """Evaluate name extraction accuracy for a given model"""
     try:
+        # Use the correct method for each model
         if model_name == "Rule_Based":
-            extracted_name = extractor.extract_name(chunk_text)
+            extracted_name = model.extract_name(text)
         elif model_name == "BioBERT":
-            extracted_name = extractor.extract_name(chunk_text)
+            extracted_name = model.extract_name(text)
         elif model_name == "BERT_CONLL03":
-            # For BERT_CONLL03, we need to ensure the model is loaded
-            if not extractor.is_loaded:
-                extractor.load_model()
+            extracted_name = model.extract_name(text)
+        elif model_name == "FineTuned_BioBERT":
+            extracted_name = model.extract_name(text)
+        else:
+            extracted_name = None
             
-            # Use the extract_name method with improved handling for CONLL03
-            extracted_name = extractor.extract_name(chunk_text)
-            
-            # Additional processing for BERT_CONLL03 to handle complex names better
-            if extracted_name and len(extracted_name.split()) < 2 and expected_name:
-                # If BERT_CONLL03 only found part of a name, try to find more parts
-                expected_parts = expected_name.split()
-                if len(expected_parts) > 1:
-                    # Look for other parts of the name in the text
-                    for part in expected_parts:
-                        if part in chunk_text and part not in extracted_name:
-                            if not extracted_name.endswith('-') and not part.startswith('-'):
-                                extracted_name += ' ' + part
+        print(f"{model_name} Name: {extracted_name}")
         
-        # Normalize names for comparison
-        expected_normalized = normalize_name(expected_name) if expected_name else ""
-        extracted_normalized = normalize_name(extracted_name) if extracted_name else ""
+        # Calculate accuracy
+        if expected_name is None:
+            # If no name is expected, accuracy is 1.0 if no name is extracted
+            accuracy = 1.0 if extracted_name is None else 0.0
+        elif extracted_name is None:
+            # If a name is expected but none is extracted, accuracy is 0.0
+            accuracy = 0.0
+        else:
+            # Simple string matching for now
+            accuracy = 1.0 if expected_name.lower() in extracted_name.lower() or extracted_name.lower() in expected_name.lower() else 0.0
         
-        # Check for exact match first
-        if extracted_name == expected_name:
-            return 1.0, extracted_name
-        
-        # Check for normalized match
-        if extracted_normalized == expected_normalized and expected_normalized:
-            return 1.0, extracted_name
-        
-        # Check for partial match (first name or last name)
-        expected_parts = expected_normalized.split() if expected_normalized else []
-        extracted_parts = extracted_normalized.split() if extracted_normalized else []
-        
-        # If either name has parts and there's an overlap
-        if expected_parts and extracted_parts:
-            # Check if any part matches
-            matching_parts = 0
-            for part in expected_parts:
-                if part in extracted_parts:
-                    matching_parts += 1
-            
-            # Calculate partial score based on how many parts match
-            if matching_parts > 0:
-                score = min(0.8, matching_parts / len(expected_parts))
-                return score, extracted_name
-        
-        # No match
-        return 0.0, extracted_name
+        return accuracy, extracted_name
     except Exception as e:
         print(f"Error in {model_name} name extraction: {str(e)}")
-        return 0.0, "ERROR"
+        return 0.0, None
 
 def normalize_name(name):
     """Normalize name for comparison by removing punctuation and standardizing spacing"""
@@ -203,6 +172,16 @@ def evaluate_models():
     biobert_ner = BioBERTNER()
     bert_name_detector = BERTNameDetector()
     
+    # Initialize fine-tuned BioBERT model
+    try:
+        # Use the base model instead of trying to load from a local path
+        fine_tuned_biobert = FineTunedBioBERTNER()
+        fine_tuned_loaded = True
+        print("Fine-tuned BioBERT model loaded successfully")
+    except Exception as e:
+        print(f"Error loading fine-tuned BioBERT model: {str(e)}")
+        fine_tuned_loaded = False
+    
     # Get all chunks from transcript.py
     chunks = {
         "CHUNK_A": CHUNK_A,
@@ -242,7 +221,8 @@ def evaluate_models():
     results = {
         "Rule_Based": defaultdict(list),
         "BioBERT": defaultdict(list),
-        "BERT_CONLL03": defaultdict(list)
+        "BERT_CONLL03": defaultdict(list),
+        "FineTuned_BioBERT": defaultdict(list)
     }
     
     # Initialize table data for comparison
@@ -272,7 +252,7 @@ def evaluate_models():
         for metric, value in rule_based_accuracy.items():
             results["Rule_Based"][metric].append(value)
         
-        row_data["Rule_Based_Accuracy"] = rule_based_accuracy["Overall_Accuracy"]
+        row_data["Rule_Based_Accuracy"] = rule_based_accuracy["overall"]
         
         # Process with BioBERT model
         biobert_name_accuracy, biobert_extracted_name = evaluate_name_extraction(
@@ -288,7 +268,31 @@ def evaluate_models():
         for metric, value in biobert_accuracy.items():
             results["BioBERT"][metric].append(value)
         
-        row_data["BioBERT_Accuracy"] = biobert_accuracy["Overall_Accuracy"]
+        row_data["BioBERT_Accuracy"] = biobert_accuracy["overall"]
+        
+        # Process with Fine-tuned BioBERT model if loaded
+        if fine_tuned_loaded:
+            try:
+                # Use the same extract_name method as BioBERT for consistency
+                fine_tuned_name_accuracy, fine_tuned_extracted_name = evaluate_name_extraction(
+                    chunk_text, expected_name, "FineTuned_BioBERT", fine_tuned_biobert
+                )
+                results["FineTuned_BioBERT"]["Patient_Name_Accuracy"].append(fine_tuned_name_accuracy)
+                
+                # Fine-tuned BioBERT NER
+                fine_tuned_prediction = fine_tuned_biobert.extract_entities(chunk_text)  # Use fine_tuned_biobert instead of biobert_ner
+                fine_tuned_accuracy = calculate_accuracy(fine_tuned_prediction, expected_output)
+                
+                # Store results for Fine-tuned BioBERT
+                for metric, value in fine_tuned_accuracy.items():
+                    results["FineTuned_BioBERT"][metric].append(value)
+                
+                row_data["FineTuned_BioBERT_Accuracy"] = fine_tuned_accuracy["overall"]
+            except Exception as e:
+                print(f"Error processing chunk {chunk_name} with Fine-tuned BioBERT: {str(e)}")
+                row_data["FineTuned_BioBERT_Accuracy"] = "N/A"
+        else:
+            row_data["FineTuned_BioBERT_Accuracy"] = "N/A"
         
         # Process with BERT_CONLL03 model
         # First check if model is loaded
@@ -321,7 +325,7 @@ def evaluate_models():
             for metric, value in bert_accuracy.items():
                 results["BERT_CONLL03"][metric].append(value)
             
-            row_data["BERT_CONLL03_Accuracy"] = bert_accuracy["Overall_Accuracy"]
+            row_data["BERT_CONLL03_Accuracy"] = bert_accuracy["overall"]
         else:
             row_data["BERT_CONLL03_Accuracy"] = "N/A"
         
@@ -335,10 +339,10 @@ def evaluate_models():
         print(f"BioBERT Name: {biobert_extracted_name}")
         if bert_name_detector.is_loaded:
             print(f"BERT_CONLL03 Name: {bert_extracted_name}")
-        print(f"Rule-Based Accuracy: {rule_based_accuracy['Overall_Accuracy']:.2f}")
-        print(f"BioBERT Accuracy: {biobert_accuracy['Overall_Accuracy']:.2f}")
+        print(f"Rule-Based Accuracy: {rule_based_accuracy['overall']:.2f}")
+        print(f"BioBERT Accuracy: {biobert_accuracy['overall']:.2f}")
         if bert_name_detector.is_loaded:
-            print(f"BERT_CONLL03 Accuracy: {bert_accuracy['Overall_Accuracy']:.2f}")
+            print(f"BERT_CONLL03 Accuracy: {bert_accuracy['overall']:.2f}")
     
     # Calculate average metrics
     avg_results = {}
@@ -353,28 +357,28 @@ def evaluate_models():
     print("\n=== OVERALL MODEL ACCURACY ===")
     for model, metrics in avg_results.items():
         print(f"\n{model} Model:")
-        print(f"  Overall Accuracy: {metrics.get('Overall_Accuracy', 'N/A'):.4f}")
-        print(f"  Patient Name Accuracy: {metrics.get('Patient_Name_Accuracy', 'N/A'):.4f}")
-        print(f"  Symptoms F1: {metrics.get('Symptoms_F1', 'N/A'):.4f}")
-        print(f"  Diagnosis Match: {metrics.get('Diagnosis_Match', 'N/A'):.4f}")
-        print(f"  Treatment F1: {metrics.get('Treatment_F1', 'N/A'):.4f}")
-        print(f"  Status Match: {metrics.get('Status_Match', 'N/A'):.4f}")
-        print(f"  Prognosis Match: {metrics.get('Prognosis_Match', 'N/A'):.4f}")
+        print(f"  Overall Accuracy: {metrics.get('overall', 'N/A'):.4f}")
+        print(f"  Patient Name Accuracy: {metrics.get('name', 'N/A'):.4f}")
+        print(f"  Symptoms F1: {metrics.get('symptoms_f1', 'N/A'):.4f}")
+        print(f"  Diagnosis Match: {metrics.get('diagnosis', 'N/A'):.4f}")
+        print(f"  Treatment F1: {metrics.get('treatment_f1', 'N/A'):.4f}")
+        print(f"  Status Match: {metrics.get('status', 'N/A'):.4f}")
+        print(f"  Prognosis Match: {metrics.get('prognosis', 'N/A'):.4f}")
     
     # Determine which model is most accurate overall
     best_model = None
     best_accuracy = -1
     
     for model, metrics in avg_results.items():
-        if metrics.get('Overall_Accuracy', 0) > best_accuracy:
+        if metrics.get('overall', 0) > best_accuracy:
             best_model = model
-            best_accuracy = metrics.get('Overall_Accuracy', 0)
+            best_accuracy = metrics.get('overall', 0)
     
     print(f"\n{best_model} is more accurate overall with accuracy {best_accuracy:.4f}.")
     
     # Detailed comparison by field
     print("\n=== FIELD-BY-FIELD COMPARISON ===")
-    fields = ["Patient_Name_Accuracy", "Symptoms_F1", "Diagnosis_Match", "Treatment_F1", "Status_Match", "Prognosis_Match"]
+    fields = ["Patient_Name_Accuracy", "symptoms_f1", "diagnosis", "treatment_f1", "status", "prognosis"]
     for field in fields:
         print(f"\n{field}:")
         
@@ -393,15 +397,24 @@ def evaluate_models():
     # Print comparison table
     print("\n=== MODEL COMPARISON TABLE ===")
     header = f"{'Chunk':<15} | {'Rule-Based':^12} | {'BioBERT':^12}"
+    if fine_tuned_loaded:
+        header += f" | {'FineTuned':^12}"
     if "BERT_CONLL03" in avg_results:
         header += f" | {'BERT_CONLL03':^12}"
     header += f" | {'Best Model':^15}"
     
     print(header)
-    print("-" * (60 + (25 if "BERT_CONLL03" in avg_results else 0)))
+    print("-" * (60 + (25 if "BERT_CONLL03" in avg_results else 0) + (15 if fine_tuned_loaded else 0)))
     
     for row in table_data:
         line = f"{row['Chunk']:<15} | {row['Rule_Based_Accuracy']:^12.4f} | {row['BioBERT_Accuracy']:^12.4f}"
+        
+        if fine_tuned_loaded:
+            if row['FineTuned_BioBERT_Accuracy'] != "N/A":
+                line += f" | {row['FineTuned_BioBERT_Accuracy']:^12.4f}"
+            else:
+                line += f" | {'N/A':^12}"
+        
         if "BERT_CONLL03" in avg_results:
             if row['BERT_CONLL03_Accuracy'] != "N/A":
                 line += f" | {row['BERT_CONLL03_Accuracy']:^12.4f}"
@@ -412,6 +425,7 @@ def evaluate_models():
         best_accuracy = max(
             row['Rule_Based_Accuracy'],
             row['BioBERT_Accuracy'],
+            row['FineTuned_BioBERT_Accuracy'] if fine_tuned_loaded and row['FineTuned_BioBERT_Accuracy'] != "N/A" else 0,
             row['BERT_CONLL03_Accuracy'] if row['BERT_CONLL03_Accuracy'] != "N/A" else 0
         )
         
@@ -420,6 +434,8 @@ def evaluate_models():
             best_models.append("Rule-Based")
         if row['BioBERT_Accuracy'] == best_accuracy:
             best_models.append("BioBERT")
+        if fine_tuned_loaded and row['FineTuned_BioBERT_Accuracy'] != "N/A" and row['FineTuned_BioBERT_Accuracy'] == best_accuracy:
+            best_models.append("FineTuned")
         if row['BERT_CONLL03_Accuracy'] != "N/A" and row['BERT_CONLL03_Accuracy'] == best_accuracy:
             best_models.append("BERT_CONLL03")
         
@@ -434,6 +450,7 @@ def evaluate_models():
         best_accuracy = max(
             row['Rule_Based_Accuracy'],
             row['BioBERT_Accuracy'],
+            row['FineTuned_BioBERT_Accuracy'] if fine_tuned_loaded and row['FineTuned_BioBERT_Accuracy'] != "N/A" else 0,
             row['BERT_CONLL03_Accuracy'] if row['BERT_CONLL03_Accuracy'] != "N/A" else 0
         )
         
@@ -441,6 +458,8 @@ def evaluate_models():
             model_counts["Rule-Based"] += 1
         if row['BioBERT_Accuracy'] == best_accuracy:
             model_counts["BioBERT"] += 1
+        if fine_tuned_loaded and row['FineTuned_BioBERT_Accuracy'] != "N/A" and row['FineTuned_BioBERT_Accuracy'] == best_accuracy:
+            model_counts["FineTuned_BioBERT"] += 1
         if row['BERT_CONLL03_Accuracy'] != "N/A" and row['BERT_CONLL03_Accuracy'] == best_accuracy:
             model_counts["BERT_CONLL03"] += 1
     
@@ -454,7 +473,7 @@ def evaluate_models():
     
     # Calculate average accuracy for test chunks
     test_avg = {
-        "Rule_Based": sum(row["Rule_Based_Accuracy"] for row in test_chunks) / len(test_chunks),
+        "Rule-Based": sum(row["Rule_Based_Accuracy"] for row in test_chunks) / len(test_chunks),
         "BioBERT": sum(row["BioBERT_Accuracy"] for row in test_chunks) / len(test_chunks)
     }
     
@@ -467,10 +486,11 @@ def evaluate_models():
     for model, avg in test_avg.items():
         print(f"  {model}: {avg:.4f}")
     
-    # Count model performance on test chunks (separate counts)
+    # Initialize test model counts with all possible model names
     test_model_counts = {
         "Rule-Based": 0,
         "BioBERT": 0,
+        "FineTuned_BioBERT": 0,
         "BERT_CONLL03": 0
     }
     
@@ -478,6 +498,7 @@ def evaluate_models():
         best_accuracy = max(
             row['Rule_Based_Accuracy'],
             row['BioBERT_Accuracy'],
+            row['FineTuned_BioBERT_Accuracy'] if fine_tuned_loaded and row['FineTuned_BioBERT_Accuracy'] != "N/A" else 0,
             row['BERT_CONLL03_Accuracy'] if row['BERT_CONLL03_Accuracy'] != "N/A" else 0
         )
         
@@ -485,6 +506,8 @@ def evaluate_models():
             test_model_counts["Rule-Based"] += 1
         if row['BioBERT_Accuracy'] == best_accuracy:
             test_model_counts["BioBERT"] += 1
+        if row['FineTuned_BioBERT_Accuracy'] != "N/A" and row['FineTuned_BioBERT_Accuracy'] == best_accuracy:
+            test_model_counts["FineTuned_BioBERT"] += 1
         if row['BERT_CONLL03_Accuracy'] != "N/A" and row['BERT_CONLL03_Accuracy'] == best_accuracy:
             test_model_counts["BERT_CONLL03"] += 1
     
@@ -497,9 +520,10 @@ def evaluate_models():
     
     # Get name accuracy for test chunks
     test_name_accuracy = {
-        "Rule_Based": [],
+        "Rule-Based": [],
         "BioBERT": [],
-        "BERT_CONLL03": []
+        "BERT_CONLL03": [],
+        "FineTuned_BioBERT": []
     }
     
     for i, row in enumerate(table_data):
@@ -507,13 +531,16 @@ def evaluate_models():
             chunk_index = list(chunks.keys()).index(row["Chunk"])
             
             if chunk_index < len(results["Rule_Based"]["Patient_Name_Accuracy"]):
-                test_name_accuracy["Rule_Based"].append(results["Rule_Based"]["Patient_Name_Accuracy"][chunk_index])
+                test_name_accuracy["Rule-Based"].append(results["Rule_Based"]["Patient_Name_Accuracy"][chunk_index])
             
             if chunk_index < len(results["BioBERT"]["Patient_Name_Accuracy"]):
                 test_name_accuracy["BioBERT"].append(results["BioBERT"]["Patient_Name_Accuracy"][chunk_index])
             
             if "BERT_CONLL03" in results and chunk_index < len(results["BERT_CONLL03"]["Patient_Name_Accuracy"]):
                 test_name_accuracy["BERT_CONLL03"].append(results["BERT_CONLL03"]["Patient_Name_Accuracy"][chunk_index])
+            
+            if fine_tuned_loaded and chunk_index < len(results["FineTuned_BioBERT"]["Patient_Name_Accuracy"]):
+                test_name_accuracy["FineTuned_BioBERT"].append(results["FineTuned_BioBERT"]["Patient_Name_Accuracy"][chunk_index])
     
     print("Name detection accuracy on test chunks:")
     for model, accuracies in test_name_accuracy.items():

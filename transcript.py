@@ -723,3 +723,300 @@ TEST_OUT_CHUNK_J = {
     "Current_Status": "Ongoing for two weeks",
     "Prognosis": "Manageable with proper ergonomics and treatment"
 }
+
+# Additional complex medical conversations with challenging name detection scenarios
+
+CHUNK_V = """
+Physician: Good morning. What brings you in today?
+Patient: I've been having these terrible headaches for about three weeks now.
+Physician: I'm sorry to hear that. Can you describe the headaches?
+Patient: They're mostly on one side, and sometimes I see flashing lights before they start.
+Physician: That sounds like it could be migraines. Have you had migraines before?
+Patient: No, this is new for me. I'm worried because my mother had a brain aneurysm.
+Physician: I understand your concern. Let's get some information first. Your name?
+Patient: Oh, I'm just J.D.
+Physician: Is that your full name or initials?
+Patient: Just call me J.D. That's what everyone calls me.
+Physician: I need your legal name for our records.
+Patient: Fine. John Dorian. But I prefer J.D.
+Physician: Thank you, Mr. Dorian. I'll note your preference for J.D. in your chart. Now, have you tried any medications for these headaches?
+Patient: Just over-the-counter stuff. Doesn't really help much.
+Physician: I'd like to order an MRI to rule out any structural issues, given your family history. I'll also prescribe a triptan medication specifically for migraines.
+Patient: Will the MRI show if I have what my mother had?
+Physician: Yes, it would detect an aneurysm if present. But let's not jump to conclusions. Migraines are much more common.
+Patient: Okay. I'm just worried, you know?
+Physician: That's completely understandable, J.D. We'll get to the bottom of this.
+"""
+
+OUT_CHUNK_V = {
+    "Patient_Name": "John Dorian (J.D.)",
+    "Symptoms": ["Headaches on one side", "Flashing lights", "Headaches lasting three weeks"],
+    "Diagnosis": "Possible migraines",
+    "Treatment": ["MRI ordered", "Triptan medication prescribed"],
+    "Current_Status": "Ongoing for three weeks, not responding to OTC medication",
+    "Prognosis": "Requires investigation due to family history of aneurysm"
+}
+
+CHUNK_W = """
+Physician: Hello there. How can I help you today?
+Patient: I've been having chest pain and shortness of breath.
+Physician: That's concerning. How long has this been happening?
+Patient: About a week. It's worse when I exert myself.
+Physician: Do you have any history of heart problems?
+Patient: No, but my father had a heart attack at 50.
+Physician: I see. And you are?
+Patient: van der Woodsen.
+Physician: Your first name?
+Patient: Serena.
+Physician: Thank you, Ms. van der Woodsen. Is there any pain radiation to your jaw or left arm?
+Patient: Sometimes to my left arm, yes.
+Physician: Given your symptoms and family history, I'd like to do an ECG right away and some blood tests. We need to rule out a cardiac issue.
+Patient: Is it serious?
+Physician: It could be, which is why we need to investigate promptly. I'm also going to prescribe nitroglycerin tablets to take if you experience chest pain.
+Patient: Okay, that sounds scary.
+Physician: Try not to worry too much, Ms. van der Woodsen. We'll get answers soon. If your chest pain becomes severe or lasts more than 15 minutes, please go to the emergency room immediately.
+"""
+
+OUT_CHUNK_W = {
+    "Patient_Name": "Serena van der Woodsen",
+    "Symptoms": ["Chest pain", "Shortness of breath", "Pain radiation to left arm", "Symptoms worse with exertion"],
+    "Diagnosis": "Possible cardiac issue",
+    "Treatment": ["ECG ordered", "Blood tests ordered", "Nitroglycerin tablets prescribed"],
+    "Current_Status": "Ongoing for one week",
+    "Prognosis": "Potentially serious, requires immediate investigation"
+}
+
+CHUNK_X = """
+Physician: Good afternoon. What seems to be the problem?
+Patient: I've been feeling really tired lately, and I've lost weight without trying.
+Physician: How long has this been going on?
+Patient: About two months. I've lost almost 10 kilograms.
+Physician: That's significant. Any other symptoms?
+Patient: I'm thirsty all the time, and I'm urinating frequently, especially at night.
+Physician: I see. Before we continue, could I get your name please?
+Patient: It's O'Malley-Smith. First name George.
+Physician: Thank you, Mr. O'Malley-Smith. Have you been monitoring your blood sugar levels?
+Patient: No, should I be?
+Physician: The symptoms you're describing are classic for diabetes. I'd like to check your blood sugar right now and order some additional tests.
+Patient: Diabetes? Really? No one in my family has that.
+Physician: It can develop without family history. Let's not jump to conclusions until we have the test results, but we should investigate this possibility.
+Patient: What would treatment involve if it is diabetes?
+Physician: It depends on the type and severity, but it could include dietary changes, exercise, and possibly medication or insulin. The good news is that diabetes can be managed effectively.
+Patient: I see. Well, let's find out then.
+"""
+
+OUT_CHUNK_X = {
+    "Patient_Name": "George O'Malley-Smith",
+    "Symptoms": ["Fatigue", "Unintentional weight loss (10kg)", "Excessive thirst", "Frequent urination", "Nocturia"],
+    "Diagnosis": "Possible diabetes mellitus",
+    "Treatment": ["Blood glucose test", "Additional laboratory tests ordered"],
+    "Current_Status": "Ongoing for two months, progressive weight loss",
+    "Prognosis": "Likely manageable with proper treatment if confirmed"
+}
+
+CHUNK_Y = """
+Physician: Hello, how are you feeling today?
+Patient: Not great. I've been having joint pain in my hands and feet.
+Physician: I'm sorry to hear that. When did this start?
+Patient: About six months ago, but it's gotten worse recently. The joints are swollen and stiff, especially in the morning.
+Physician: Are you experiencing fatigue as well?
+Patient: Yes, I'm exhausted all the time.
+Physician: I'll need to run some tests. Could you tell me your name?
+Patient: Dr. Torres.
+Physician: Your first name as well, please?
+Patient: Callie. Dr. Callie Torres. I'm an orthopedic surgeon at Seattle Grace.
+Physician: I see, Dr. Torres. As a medical professional, you probably have some thoughts about your symptoms?
+Patient: I'm concerned about rheumatoid arthritis. The symmetric joint involvement, morning stiffness, fatigue... it fits.
+Physician: I agree that's a possibility. I'd like to order rheumatoid factor, anti-CCP antibodies, ESR, and CRP tests. We should also get X-rays of your hands and feet.
+Patient: I'd appreciate that. It's affecting my ability to perform surgeries.
+Physician: I understand how concerning that must be. If it is RA, there are effective treatments available now that can help prevent joint damage and maintain function.
+Patient: Thank you. I just need to know what I'm dealing with.
+"""
+
+OUT_CHUNK_Y = {
+    "Patient_Name": "Dr. Callie Torres",
+    "Symptoms": ["Joint pain in hands and feet", "Joint swelling", "Morning stiffness", "Fatigue", "Symmetric joint involvement"],
+    "Diagnosis": "Possible rheumatoid arthritis",
+    "Treatment": ["Rheumatoid factor test", "Anti-CCP antibodies test", "ESR and CRP tests", "X-rays of hands and feet"],
+    "Current_Status": "Ongoing for six months, worsening, affecting work ability",
+    "Prognosis": "Potentially manageable with early intervention"
+}
+
+CHUNK_Z = """
+Physician: Good morning. What can I do for you today?
+Patient: I've been having trouble sleeping. I lie awake for hours, and when I do sleep, I wake up frequently.
+Physician: How long have you been experiencing these sleep issues?
+Patient: About three months. It started after I lost my job.
+Physician: I see. Are you experiencing any other symptoms like low mood or anxiety?
+Patient: Yes, I feel down most of the time, and I've lost interest in things I used to enjoy.
+Physician: I understand. Could you tell me your name?
+Patient: McSteamy. Mark McSteamy.
+Physician: Is that spelled M-c-S-t-e-a-m-y?
+Patient: Actually, it's M-c-S-t-e-a-m-y. Scottish heritage.
+Physician: Thank you, Mr. McSteamy. Based on what you've described, you may be experiencing depression, which can significantly affect sleep.
+Patient: I figured it might be something like that.
+Physician: I'd like to do a depression screening assessment and discuss treatment options, which might include therapy, medication, or both.
+Patient: I'm open to therapy, but I'm hesitant about medication.
+Physician: That's completely understandable. We can start with therapy and see how you respond. Cognitive-behavioral therapy is particularly effective for both depression and insomnia.
+Patient: That sounds good. I just want to feel like myself again.
+Physician: We'll work on that together, Mr. McSteamy. Recovery is definitely possible.
+"""
+
+OUT_CHUNK_Z = {
+    "Patient_Name": "Mark McSteamy",
+    "Symptoms": ["Insomnia", "Frequent waking", "Low mood", "Anhedonia"],
+    "Diagnosis": "Possible depression with insomnia",
+    "Treatment": ["Depression screening assessment", "Cognitive-behavioral therapy recommended"],
+    "Current_Status": "Ongoing for three months, following job loss",
+    "Prognosis": "Good potential for recovery with appropriate treatment"
+}
+
+CHUNK_AA = """
+Physician: Good afternoon. What brings you in today?
+Patient: I've been experiencing recurring abdominal pain and diarrhea.
+Physician: I'm sorry to hear that. How long has this been going on?
+Patient: On and off for about a year, but it's been worse the past month.
+Physician: Do you notice any particular foods that trigger these symptoms?
+Patient: Dairy products definitely make it worse. Sometimes wheat too.
+Physician: I see. And your name is?
+Patient: My name is Grey-Shepherd.
+Physician: And your first name?
+Patient: Meredith.
+Physician: Thank you, Ms. Grey-Shepherd. Based on your symptoms, we should consider conditions like irritable bowel syndrome or possibly celiac disease.
+Patient: My mother had ulcerative colitis. Could it be that?
+Physician: That's important information. Given your family history, we should definitely rule that out as well. I'd like to order some blood tests and possibly refer you for a colonoscopy.
+Patient: Is there anything I can do in the meantime?
+Physician: I'd recommend keeping a food diary to identify triggers, and you might want to try eliminating dairy and wheat temporarily to see if that helps.
+Patient: Okay, I can do that.
+Physician: Great. We'll get to the bottom of this, Ms. Grey-Shepherd.
+"""
+
+OUT_CHUNK_AA = {
+    "Patient_Name": "Meredith Grey-Shepherd",
+    "Symptoms": ["Recurring abdominal pain", "Diarrhea", "Symptoms worsen with dairy and wheat consumption"],
+    "Diagnosis": "Possible IBS, celiac disease, or inflammatory bowel disease",
+    "Treatment": ["Blood tests ordered", "Possible colonoscopy referral", "Food diary recommended", "Trial elimination diet suggested"],
+    "Current_Status": "Ongoing for a year, worsening in past month",
+    "Prognosis": "Likely manageable with proper diagnosis and treatment"
+}
+
+CHUNK_AB = """
+Physician: Hello there. What seems to be the problem today?
+Patient: I've been having these dizzy spells. Sometimes the room feels like it's spinning.
+Physician: How often do these episodes occur?
+Patient: A few times a week. They last for about a minute each time.
+Physician: Is there anything that seems to trigger them?
+Patient: They often happen when I turn my head quickly or get up from bed.
+Physician: I see. Could I have your name please?
+Patient: Just put down "House."
+Physician: I need your full name for our records.
+Patient: Gregory House, M.D. But I prefer to go by House.
+Physician: Thank you, Dr. House. Your symptoms sound consistent with benign paroxysmal positional vertigo, or BPPV.
+Patient: I suspected as much. Otoliths in the semicircular canals?
+Physician: Exactly. I'd like to perform the Dix-Hallpike maneuver to confirm, and if positive, we can try the Epley maneuver right away to reposition the crystals.
+Patient: Fine, but I've already tried the Epley maneuver on myself. Didn't help.
+Physician: It can be difficult to perform correctly on yourself. Let's try it here, and I can also prescribe an anti-vertigo medication for symptomatic relief.
+Patient: Whatever. Let's just get this over with.
+"""
+
+OUT_CHUNK_AB = {
+    "Patient_Name": "Gregory House, M.D.",
+    "Symptoms": ["Dizzy spells", "Vertigo", "Room spinning sensation", "Symptoms triggered by head movement and positional changes"],
+    "Diagnosis": "Likely benign paroxysmal positional vertigo (BPPV)",
+    "Treatment": ["Dix-Hallpike maneuver for diagnosis", "Epley maneuver", "Anti-vertigo medication"],
+    "Current_Status": "Occurring multiple times weekly, lasting about a minute each episode",
+    "Prognosis": "Generally good with proper treatment"
+}
+
+CHUNK_AC = """
+Physician: Good morning. How can I help you today?
+Patient: I've been having a persistent cough for over a month now.
+Physician: Is it a dry cough or are you coughing up anything?
+Patient: It's mostly dry, but sometimes I cough up a small amount of clear mucus.
+Physician: Any other symptoms like fever, chest pain, or shortness of breath?
+Patient: No fever, but I do get short of breath more easily than usual.
+Physician: I see. And your name is?
+Patient: de la Cruz.
+Physician: Your first name as well, please?
+Patient: Cristina de la Cruz.
+Physician: Thank you, Ms. de la Cruz. Do you smoke or have you ever smoked?
+Patient: I quit about five years ago. I smoked for ten years before that.
+Physician: Given your history and symptoms, I'd like to order a chest X-ray and pulmonary function tests. This could be chronic bronchitis, asthma, or another respiratory condition.
+Patient: Could it be something more serious?
+Physician: We need to rule out more serious conditions, but let's not jump to conclusions before we have the test results.
+Patient: Okay. How soon can we do these tests?
+Physician: We can schedule the chest X-ray for today, and the pulmonary function tests within the week.
+Patient: Thank you, doctor.
+"""
+
+OUT_CHUNK_AC = {
+    "Patient_Name": "Cristina de la Cruz",
+    "Symptoms": ["Persistent cough for over a month", "Occasional clear mucus", "Shortness of breath with exertion"],
+    "Diagnosis": "Possible chronic bronchitis, asthma, or other respiratory condition",
+    "Treatment": ["Chest X-ray ordered", "Pulmonary function tests ordered"],
+    "Current_Status": "Ongoing for over a month",
+    "Prognosis": "Requires investigation, likely manageable with proper treatment"
+}
+
+CHUNK_AD = """
+Physician: Good afternoon. What brings you in today?
+Patient: I've been having these strange episodes where I lose awareness for a few seconds.
+Physician: Can you describe what happens during these episodes?
+Patient: I just kind of blank out. People tell me I stare and sometimes my eyelids flutter.
+Physician: How long do these episodes last, and how often do they occur?
+Patient: Maybe 10-15 seconds each time. They happen a few times a week now.
+Physician: Have you ever lost consciousness completely or had convulsions?
+Patient: No, nothing like that.
+Physician: I see. Could you tell me your name?
+Patient: It's St. Patrick.
+Physician: Your full name, please?
+Patient: Izzie St. Patrick. That's I-Z-Z-I-E.
+Physician: Thank you, Ms. St. Patrick. Based on your description, these episodes sound like they could be absence seizures.
+Patient: Seizures? But I thought seizures meant falling down and shaking?
+Physician: That's one type of seizure, but there are many different kinds. Absence seizures are brief episodes exactly like what you're describing.
+Patient: Is this serious?
+Physician: It's something we need to address. I'd like to refer you for an EEG to record your brain activity, and possibly an MRI to rule out any structural causes.
+Patient: Will I need medication?
+Physician: If the diagnosis is confirmed, then yes, anti-seizure medication is typically very effective for controlling absence seizures.
+Patient: I see. Thank you for explaining.
+"""
+
+OUT_CHUNK_AD = {
+    "Patient_Name": "Izzie St. Patrick",
+    "Symptoms": ["Brief loss of awareness", "Staring episodes", "Eyelid fluttering", "Episodes lasting 10-15 seconds"],
+    "Diagnosis": "Possible absence seizures",
+    "Treatment": ["EEG referral", "Possible MRI", "Potential anti-seizure medication"],
+    "Current_Status": "Occurring multiple times weekly",
+    "Prognosis": "Typically controllable with appropriate medication"
+}
+
+CHUNK_AE = """
+Physician: Hello. What can I do for you today?
+Patient: I've been having trouble with my memory. I keep forgetting things.
+Physician: What kinds of things are you forgetting?
+Patient: Recent conversations, where I put things, appointments. Last week I left the stove on all day.
+Physician: How long have you noticed these memory problems?
+Patient: They've been getting worse over the past year or so.
+Physician: I see. And your name is?
+Patient: I'm... um... just a moment... I'm sorry, this is embarrassing.
+Physician: Take your time.
+Patient: Al. Al Z. Heimer. That's my name.
+Physician: Mr. Heimer, is there someone who came with you today who can help provide some additional information?
+Patient: My daughter is in the waiting room.
+Physician: With your permission, I'd like to speak with her as well. Memory issues can have many causes, from stress and medication side effects to neurological conditions.
+Patient: Yes, please talk to her. She's been very worried about me.
+Physician: I'd like to perform a cognitive assessment today and then order some tests, including blood work and possibly brain imaging.
+Patient: Will this get better, doctor?
+Physician: That depends on the cause. Some memory issues are reversible, while others can be managed with proper treatment. We'll take this one step at a time.
+Patient: Thank you. I'm scared about what's happening to me.
+Physician: I understand, Mr. Heimer. We'll work through this together.
+"""
+
+OUT_CHUNK_AE = {
+    "Patient_Name": "Al Z. Heimer",
+    "Symptoms": ["Progressive memory loss", "Forgetting conversations", "Misplacing items", "Forgetting appointments", "Safety concerns (left stove on)"],
+    "Diagnosis": "Possible cognitive impairment, multiple potential causes",
+    "Treatment": ["Cognitive assessment", "Blood tests ordered", "Possible brain imaging"],
+    "Current_Status": "Progressive worsening over approximately one year",
+    "Prognosis": "Depends on underlying cause, requires thorough investigation"
+}
