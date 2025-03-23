@@ -41,49 +41,78 @@ prasn_1
 └── README.md
 ```
 
-## Comparison BioBERT vs Rule-Based NER vs BERT CONLL03
-```
-=== MODEL COMPARISON TABLE ===
-Chunk      |  Rule-Based  |   BioBERT    | BERT_CONLL03 |   Best Model   
---------------------------------------------------------------------------------
-CHUNK_A    |    0.1111    |    0.0370    |    0.2037    |  BERT_CONLL03  
-CHUNK_B    |    0.4103    |    0.2179    |    0.2179    | BioBERT & BERT_CONLL03
-CHUNK_C    |    0.1667    |    0.1667    |    0.1667    |    All Equal   
-CHUNK_D    |    0.2083    |    0.2000    |    0.2000    | BioBERT & BERT_CONLL03
-CHUNK_E    |    0.2778    |    0.2778    |    0.2778    |    All Equal   
-CHUNK_F    |    0.1667    |    0.0000    |    0.0000    | BioBERT & BERT_CONLL03
-CHUNK_G    |    0.1667    |    0.1667    |    0.1667    |    All Equal   
-CHUNK_H    |    0.0556    |    0.0000    |    0.1667    |  BERT_CONLL03  
-CHUNK_I    |    0.2222    |    0.1667    |    0.1667    | BioBERT & BERT_CONLL03
-CHUNK_J    |    0.1667    |    0.0000    |    0.1667    | Rule-Based & BERT_CONLL03
-CHUNK_K    |    0.1667    |    0.1667    |    0.1667    |    All Equal   
-CHUNK_L    |    0.1667    |    0.1667    |    0.1667    |    All Equal   
-CHUNK_M    |    0.1667    |    0.1667    |    0.1667    |    All Equal   
-CHUNK_N    |    0.0000    |    0.0000    |    0.0000    |    All Equal   
-CHUNK_O    |    0.0000    |    0.1667    |    0.0000    | Rule-Based & BERT_CONLL03
-CHUNK_P    |    0.2778    |    0.0000    |    0.1667    |   Rule-Based   
-CHUNK_Q    |    0.0000    |    0.1667    |    0.1667    | BioBERT & BERT_CONLL03
-CHUNK_R    |    0.0606    |    0.2111    |    0.2111    | BioBERT & BERT_CONLL03
-CHUNK_S    |    0.0741    |    0.1667    |    0.1667    | BioBERT & BERT_CONLL03
-CHUNK_T    |    0.2273    |    0.2333    |    0.2333    | BioBERT & BERT_CONLL03
-CHUNK_U    |    0.0000    |    0.0000    |    0.0000    |    All Equal   
-TEST_CHUNK_A |    0.2333    |    0.2143    |    0.2143    | BioBERT & BERT_CONLL03
-TEST_CHUNK_B |    0.3333    |    0.0303    |    0.1970    |   Rule-Based   
-TEST_CHUNK_C |    0.0000    |    0.0000    |    0.0000    |    All Equal   
-TEST_CHUNK_D |    0.1667    |    0.0000    |    0.1667    | Rule-Based & BERT_CONLL03
-TEST_CHUNK_E |    0.0000    |    0.0000    |    0.0000    |    All Equal   
-TEST_CHUNK_F |    0.2333    |    0.0556    |    0.2222    |   Rule-Based   
-TEST_CHUNK_G |    0.1667    |    0.0000    |    0.1667    | Rule-Based & BERT_CONLL03
-TEST_CHUNK_H |    0.1667    |    0.0000    |    0.0000    | BioBERT & BERT_CONLL03
-TEST_CHUNK_I |    0.0000    |    0.0000    |    0.0000    |    All Equal   
-TEST_CHUNK_J |    0.1667    |    0.0000    |    0.0000    | BioBERT & BERT_CONLL03
-```
-```
-=== MODEL PERFORMANCE SUMMARY ===
-BERT_CONLL03 better on 2 chunks
-BioBERT & BERT_CONLL03 better on 7 chunks
-All Equal better on 8 chunks
-Rule-Based better on 2 chunks
-Rule-Based & BERT_CONLL03 better on 2 chunks
-```
-### note : BERT_CONLL03 is the most accurate model overall based on the comparison table.
+# 📊 Model Performance Report
+
+## 🔍 Overview
+This document provides an interactive comparison of three models:
+- **Rule-Based Model**
+- **BioBERT Model**
+- **BERT_CONLL03 Model**
+
+### **🏆 Best Performing Model:**
+- The **Rule-Based Model** achieved the highest overall accuracy of **0.1470**.
+
+## 📈 Overall Model Accuracy
+| Model          | Overall Accuracy | Patient Name Accuracy | Symptoms F1 | Diagnosis Match | Treatment F1 | Status Match | Prognosis Match |
+|---------------|-----------------|-----------------------|------------|----------------|-------------|--------------|---------------|
+| Rule-Based    | **0.1470**       | **0.7527**           | **0.1387** | **0.0645**     | **0.0339**  | **0.0000**   | **0.0000**    |
+| BioBERT      | 0.1014           | 0.6849                | 0.0660     | 0.0323         | 0.0264      | 0.0000       | 0.0000        |
+| BERT_CONLL03 | 0.1175           | 0.6774                | 0.0660     | 0.0323         | 0.0264      | 0.0000       | 0.0000        |
+
+## 📊 Field-by-Field Comparison
+| Field                | Rule-Based | BioBERT | BERT_CONLL03 | Best Model |
+|----------------------|------------|---------|-------------|------------|
+| **Patient Name Accuracy** | **0.7527** | 0.6849  | 0.6774      | **Rule-Based** |
+| **Symptoms F1**           | **0.1387** | 0.0660  | 0.0660      | **Rule-Based** |
+| **Diagnosis Match**       | **0.0645** | 0.0323  | 0.0323      | **Rule-Based** |
+| **Treatment F1**         | **0.0339** | 0.0264  | 0.0264      | **Rule-Based** |
+| **Status Match**         | 0.0000    | 0.0000  | 0.0000      | **Tie**       |
+| **Prognosis Match**      | 0.0000    | 0.0000  | 0.0000      | **Tie**       |
+
+## 📌 Model Comparison by Chunks
+This section compares model performance across multiple chunks.
+
+| Chunk     | Rule-Based | BioBERT | BERT_CONLL03 | Best Model |
+|-----------|------------|---------|-------------|------------|
+| CHUNK_A   | **0.1111** | 0.0370  | 0.0370      | **Rule-Based** |
+| CHUNK_B   | **0.4103** | 0.3846  | 0.3846      | **Rule-Based** |
+| CHUNK_C   | 0.1667    | 0.1667  | 0.1667      | **Tie** |
+| CHUNK_D   | **0.2083** | 0.2000  | 0.2000      | **Rule-Based** |
+| CHUNK_E   | 0.2778    | 0.2778  | 0.2778      | **Tie** |
+| CHUNK_F   | 0.1667    | 0.0000  | 0.1667      | **Tie** |
+| ...       | ...        | ...     | ...         | ... |
+
+### **📌 Summary of Chunk-Wise Best Model Performance:**
+- **Rule-Based Model** is best on **26** chunks.
+- **BioBERT Model** is best on **16** chunks.
+- **BERT_CONLL03 Model** is best on **17** chunks.
+
+## 🎯 Model Performance on Test Chunks
+| Model         | Avg. Accuracy on Test Chunks |
+|--------------|------------------------------|
+| **Rule-Based** | **0.1467** |
+| BioBERT      | 0.0300   |
+| BERT_CONLL03 | 0.0800   |
+
+### **🏆 Best Model on Test Chunks:**
+| Model         | Best on # Test Chunks |
+|--------------|----------------------|
+| **Rule-Based** | **10** (100.0%) |
+| BioBERT      | 3 (30.0%)  |
+| BERT_CONLL03 | 5 (50.0%)  |
+
+## 🔬 Name Detection Analysis
+| Model         | Name Detection Accuracy |
+|--------------|-------------------------|
+| Rule-Based    | 0.7667                  |
+| **BioBERT**  | **0.8667**               |
+| BERT_CONLL03 | 0.7333                   |
+
+## 📌 Conclusion
+- **Rule-Based Model** performs best overall with the highest accuracy across multiple chunks and test cases.
+- **BioBERT Model** excels in **name detection** accuracy.
+- **Further improvements** needed in **Status Match & Prognosis Match** as all models score **0.0000** in these fields.
+
+---
+🚀 **Explore more insights by running evaluations on new datasets!**
+

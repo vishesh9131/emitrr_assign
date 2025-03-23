@@ -124,7 +124,7 @@ with left_col:
         [
             "Rule-based NER", 
             "BioBERT NER", 
-            "BERT CONLL03[more accurate]"
+            "BERT CONLL03[complex name handling]"
         ],
         help="Select the method to extract medical entities from the text"
     )
@@ -134,8 +134,8 @@ with left_col:
         st.info("📝 **Rule-based NER**: Fast pattern matching for basic entity extraction.")
     elif ner_method == "BioBERT NER":
         st.info("🧬 **BioBERT NER**: Specialized for biomedical text and medical terms.")
-    elif ner_method == "BERT CONLL03[more accurate]":
-        st.info("🔍 **BERT CONLL03**: High-accuracy model for names. (~1.2GB download on first use)")
+    elif ner_method == "BERT CONLL03[complex name handling]":
+        st.info("🔍 **BERT CONLL03**: Complex info handling model for names. (~1.2GB download on first use)")
     
     # Process button
     process_button = st.button("Process Transcript")
@@ -153,7 +153,7 @@ if process_button:
             entities = rule_based_ner.extract_entities(transcript)
         elif ner_method == "BioBERT NER":
             entities = biobert_ner.extract_entities(transcript)
-        elif ner_method == "BERT CONLL03[more accurate]":
+        elif ner_method == "BERT CONLL03[complex name handling]":
             # Only check model loading when this option is selected
             if not bert_name_detector.is_loaded:
                 with left_col:

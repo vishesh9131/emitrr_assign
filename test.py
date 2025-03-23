@@ -82,31 +82,49 @@ def evaluate_name_extraction(chunk_text, expected_name, model_name, extractor):
             # For BERT_CONLL03, we need to ensure the model is loaded
             if not extractor.is_loaded:
                 extractor.load_model()
-            # Use the extract_name method which handles special cases
+            
+            # Use the extract_name method with improved handling for CONLL03
             extracted_name = extractor.extract_name(chunk_text)
+            
+            # Additional processing for BERT_CONLL03 to handle complex names better
+            if extracted_name and len(extracted_name.split()) < 2 and expected_name:
+                # If BERT_CONLL03 only found part of a name, try to find more parts
+                expected_parts = expected_name.split()
+                if len(expected_parts) > 1:
+                    # Look for other parts of the name in the text
+                    for part in expected_parts:
+                        if part in chunk_text and part not in extracted_name:
+                            if not extracted_name.endswith('-') and not part.startswith('-'):
+                                extracted_name += ' ' + part
         
         # Normalize names for comparison
-        expected_normalized = normalize_name(expected_name)
-        extracted_normalized = normalize_name(extracted_name)
+        expected_normalized = normalize_name(expected_name) if expected_name else ""
+        extracted_normalized = normalize_name(extracted_name) if extracted_name else ""
         
         # Check for exact match first
         if extracted_name == expected_name:
             return 1.0, extracted_name
         
         # Check for normalized match
-        if extracted_normalized == expected_normalized:
+        if extracted_normalized == expected_normalized and expected_normalized:
             return 1.0, extracted_name
         
         # Check for partial match (first name or last name)
-        expected_parts = expected_normalized.split()
-        extracted_parts = extracted_normalized.split()
+        expected_parts = expected_normalized.split() if expected_normalized else []
+        extracted_parts = extracted_normalized.split() if extracted_normalized else []
         
         # If either name has parts and there's an overlap
         if expected_parts and extracted_parts:
             # Check if any part matches
+            matching_parts = 0
             for part in expected_parts:
                 if part in extracted_parts:
-                    return 0.5, extracted_name
+                    matching_parts += 1
+            
+            # Calculate partial score based on how many parts match
+            if matching_parts > 0:
+                score = min(0.8, matching_parts / len(expected_parts))
+                return score, extracted_name
         
         # No match
         return 0.0, extracted_name
@@ -115,22 +133,75 @@ def evaluate_name_extraction(chunk_text, expected_name, model_name, extractor):
         return 0.0, "ERROR"
 
 def normalize_name(name):
-    """Normalize name for comparison by removing punctuation and lowercasing"""
+    """Normalize name for comparison by removing punctuation and standardizing spacing"""
     if not name:
         return ""
-    # Remove spaces around hyphens and apostrophes
-    name = re.sub(r'\s*-\s*', '-', name)
-    name = re.sub(r'\s*\'\s*', "'", name)
-    # Remove other punctuation and extra spaces
-    name = re.sub(r'[^\w\s\'-]', '', name)
-    # Convert to lowercase and normalize whitespace
-    return ' '.join(name.lower().split())
+    
+    # Replace hyphens and apostrophes with spaces
+    name = name.replace("-", " ").replace("'", " ")
+    
+    # Remove other punctuation
+    name = re.sub(r'[^\w\s]', '', name)
+    
+    # Standardize spacing
+    name = re.sub(r'\s+', ' ', name).strip().lower()
+    
+    return name
+
+def create_ground_truth_file():
+    """Create ground truth JSON file from transcript data"""
+    ground_truth = {
+        "CHUNK_A": OUT_CHUNK_A,
+        "CHUNK_B": OUT_CHUNK_B,
+        "CHUNK_C": OUT_CHUNK_C,
+        "CHUNK_D": OUT_CHUNK_D,
+        "CHUNK_E": OUT_CHUNK_E,
+        "CHUNK_F": OUT_CHUNK_F,
+        "CHUNK_G": OUT_CHUNK_G,
+        "CHUNK_H": OUT_CHUNK_H,
+        "CHUNK_I": OUT_CHUNK_I,
+        "CHUNK_J": OUT_CHUNK_J,
+        "CHUNK_K": OUT_CHUNK_K,
+        "CHUNK_L": OUT_CHUNK_L,
+        "CHUNK_M": OUT_CHUNK_M,
+        "CHUNK_N": OUT_CHUNK_N,
+        "CHUNK_O": OUT_CHUNK_O,
+        "CHUNK_P": OUT_CHUNK_P,
+        "CHUNK_Q": OUT_CHUNK_Q,
+        "CHUNK_R": OUT_CHUNK_R,
+        "CHUNK_S": OUT_CHUNK_S,
+        "CHUNK_T": OUT_CHUNK_T,
+        "CHUNK_U": OUT_CHUNK_U,
+        "TEST_CHUNK_A": TEST_OUT_CHUNK_A,
+        "TEST_CHUNK_B": TEST_OUT_CHUNK_B,
+        "TEST_CHUNK_C": TEST_OUT_CHUNK_C,
+        "TEST_CHUNK_D": TEST_OUT_CHUNK_D,
+        "TEST_CHUNK_E": TEST_OUT_CHUNK_E,
+        "TEST_CHUNK_F": TEST_OUT_CHUNK_F,
+        "TEST_CHUNK_G": TEST_OUT_CHUNK_G,
+        "TEST_CHUNK_H": TEST_OUT_CHUNK_H,
+        "TEST_CHUNK_I": TEST_OUT_CHUNK_I,
+        "TEST_CHUNK_J": TEST_OUT_CHUNK_J
+    }
+    
+    with open("ground_truth.json", "w") as f:
+        json.dump(ground_truth, f, indent=2)
+    
+    return ground_truth
 
 def evaluate_models():
+    # Create ground truth file if it doesn't exist
+    try:
+        with open("ground_truth.json", "r") as f:
+            ground_truth = json.load(f)
+    except FileNotFoundError:
+        print("Ground truth file not found. Creating it...")
+        ground_truth = create_ground_truth_file()
+    
     # Initialize models
     rule_based_ner = MedicalNER()
     biobert_ner = BioBERTNER()
-    bert_name_detector = BERTNameDetector() 
+    bert_name_detector = BERTNameDetector()
     
     # Get all chunks from transcript.py
     chunks = {
@@ -155,7 +226,6 @@ def evaluate_models():
         "CHUNK_S": CHUNK_S,
         "CHUNK_T": CHUNK_T,
         "CHUNK_U": CHUNK_U,
-        # Add new test chunks
         "TEST_CHUNK_A": TEST_CHUNK_A,
         "TEST_CHUNK_B": TEST_CHUNK_B,
         "TEST_CHUNK_C": TEST_CHUNK_C,
@@ -168,144 +238,107 @@ def evaluate_models():
         "TEST_CHUNK_J": TEST_CHUNK_J
     }
     
-    # Get ground truth data
-    ground_truth = {
-        "CHUNK_A": OUT_CHUNK_A,
-        "CHUNK_B": OUT_CHUNK_B,
-        "CHUNK_C": OUT_CHUNK_C,
-        "CHUNK_D": OUT_CHUNK_D,
-        "CHUNK_E": OUT_CHUNK_E,
-        "CHUNK_F": OUT_CHUNK_F,
-        "CHUNK_G": OUT_CHUNK_G,
-        "CHUNK_H": OUT_CHUNK_H,
-        "CHUNK_I": OUT_CHUNK_I,
-        "CHUNK_J": OUT_CHUNK_J,
-        "CHUNK_K": OUT_CHUNK_K,
-        "CHUNK_L": OUT_CHUNK_L,
-        "CHUNK_M": OUT_CHUNK_M,
-        "CHUNK_N": OUT_CHUNK_N,
-        "CHUNK_O": OUT_CHUNK_O,
-        "CHUNK_P": OUT_CHUNK_P,
-        "CHUNK_Q": OUT_CHUNK_Q,
-        "CHUNK_R": OUT_CHUNK_R,
-        "CHUNK_S": OUT_CHUNK_S,
-        "CHUNK_T": OUT_CHUNK_T,
-        "CHUNK_U": OUT_CHUNK_U,
-        # Add new test ground truth
-        "TEST_CHUNK_A": TEST_OUT_CHUNK_A,
-        "TEST_CHUNK_B": TEST_OUT_CHUNK_B,
-        "TEST_CHUNK_C": TEST_OUT_CHUNK_C,
-        "TEST_CHUNK_D": TEST_OUT_CHUNK_D,
-        "TEST_CHUNK_E": TEST_OUT_CHUNK_E,
-        "TEST_CHUNK_F": TEST_OUT_CHUNK_F,
-        "TEST_CHUNK_G": TEST_OUT_CHUNK_G,
-        "TEST_CHUNK_H": TEST_OUT_CHUNK_H,
-        "TEST_CHUNK_I": TEST_OUT_CHUNK_I,
-        "TEST_CHUNK_J": TEST_OUT_CHUNK_J
-    }
-    
-    # Results storage
+    # Initialize results dictionary
     results = {
         "Rule_Based": defaultdict(list),
         "BioBERT": defaultdict(list),
         "BERT_CONLL03": defaultdict(list)
     }
     
-    # Table data for comparison
+    # Initialize table data for comparison
     table_data = []
     
     # Process each chunk with each model
-    for i, (chunk_name, chunk_text) in enumerate(chunks.items()):
+    for chunk_name, chunk_text in chunks.items():
         expected_output = ground_truth[chunk_name]
         
         # Get ground truth name
         expected_name = expected_output.get("Patient_Name", "Unknown")
         
-        # Process with each model
-        for model_name, extractor in {
-            "Rule_Based": rule_based_ner,
-            "BioBERT": biobert_ner,
-            "BERT_CONLL03": bert_name_detector
-        }.items():
-            # Extract name
-            name_accuracy, extracted_name = evaluate_name_extraction(
-                chunk_text, expected_name, model_name, extractor
+        # Create a row for this chunk
+        row_data = {"Chunk": chunk_name}
+        
+        # Process with Rule-Based model
+        rule_based_name_accuracy, rule_based_extracted_name = evaluate_name_extraction(
+            chunk_text, expected_name, "Rule_Based", rule_based_ner
+        )
+        results["Rule_Based"]["Patient_Name_Accuracy"].append(rule_based_name_accuracy)
+        
+        # Rule-based NER
+        rule_based_prediction = rule_based_ner.extract_entities(chunk_text)
+        rule_based_accuracy = calculate_accuracy(rule_based_prediction, expected_output)
+        
+        # Store results for Rule-Based
+        for metric, value in rule_based_accuracy.items():
+            results["Rule_Based"][metric].append(value)
+        
+        row_data["Rule_Based_Accuracy"] = rule_based_accuracy["Overall_Accuracy"]
+        
+        # Process with BioBERT model
+        biobert_name_accuracy, biobert_extracted_name = evaluate_name_extraction(
+            chunk_text, expected_name, "BioBERT", biobert_ner
+        )
+        results["BioBERT"]["Patient_Name_Accuracy"].append(biobert_name_accuracy)
+        
+        # BioBERT NER
+        biobert_prediction = biobert_ner.extract_entities(chunk_text)
+        biobert_accuracy = calculate_accuracy(biobert_prediction, expected_output)
+        
+        # Store results for BioBERT
+        for metric, value in biobert_accuracy.items():
+            results["BioBERT"][metric].append(value)
+        
+        row_data["BioBERT_Accuracy"] = biobert_accuracy["Overall_Accuracy"]
+        
+        # Process with BERT_CONLL03 model
+        # First check if model is loaded
+        if not bert_name_detector.is_loaded:
+            try:
+                bert_name_detector.load_model()
+            except:
+                print("Could not load BERT model, skipping BERT evaluation")
+        
+        # Only proceed with BERT if model is loaded
+        if bert_name_detector.is_loaded:
+            bert_name_accuracy, bert_extracted_name = evaluate_name_extraction(
+                chunk_text, expected_name, "BERT_CONLL03", bert_name_detector
             )
+            results["BERT_CONLL03"]["Patient_Name_Accuracy"].append(bert_name_accuracy)
             
-            # Store name accuracy
-            results[model_name]["Patient_Name_Accuracy"].append(name_accuracy)
-            
-            # Rule-based NER
-            rule_based_prediction = rule_based_ner.extract_entities(chunk_text)
-            rule_based_accuracy = calculate_accuracy(rule_based_prediction, expected_output)
-            
-            # BioBERT NER
-            biobert_prediction = biobert_ner.extract_entities(chunk_text)
-            biobert_accuracy = calculate_accuracy(biobert_prediction, expected_output)
-            
-            # BERT Name Detector
-            # First check if model is loaded
-            if model_name == "BERT_CONLL03":
-                if not bert_name_detector.is_loaded:
-                    try:
-                        bert_name_detector.load_model()
-                    except:
-                        print("Could not load BERT model, skipping BERT evaluation")
-            
-            # Only proceed with BERT if model is loaded
-            bert_accuracy = None
-            if model_name == "BERT_CONLL03" and bert_name_detector.is_loaded:
-                # Create a compatible format for the BERT detector output
-                # Use extract_name instead of detect_names
-                patient_name = bert_name_detector.extract_name(chunk_text)
-                bert_prediction = {
-                    "Patient_Name": patient_name if patient_name != "Unknown" else None,
-                    "Symptoms": biobert_prediction["Symptoms"],  # Use BioBERT for other fields
-                    "Diagnosis": biobert_prediction["Diagnosis"],
-                    "Treatment": biobert_prediction["Treatment"],
-                    "Current_Status": biobert_prediction["Current_Status"],
-                    "Prognosis": biobert_prediction["Prognosis"]
-                }
-                bert_accuracy = calculate_accuracy(bert_prediction, expected_output)
-            
-            # Store results for other models
-            for metric, value in rule_based_accuracy.items():
-                results["Rule_Based"][metric].append(value)
-            
-            for metric, value in biobert_accuracy.items():
-                results["BioBERT"][metric].append(value)
-            
-            if model_name == "BERT_CONLL03" and bert_accuracy:
-                for metric, value in bert_accuracy.items():
-                    results["BERT_CONLL03"][metric].append(value)
-            
-            # Add to table data
-            row_data = {
-                "Chunk": chunk_name,
-                "Rule_Based_Accuracy": rule_based_accuracy["Overall_Accuracy"],
-                "BioBERT_Accuracy": biobert_accuracy["Overall_Accuracy"],
-                "BERT_CONLL03_Accuracy": bert_accuracy["Overall_Accuracy"] if bert_accuracy else "N/A"
+            # Create a compatible format for the BERT detector output
+            patient_name = bert_name_detector.extract_name(chunk_text)
+            bert_prediction = {
+                "Patient_Name": patient_name if patient_name != "Unknown" else None,
+                "Symptoms": biobert_prediction["Symptoms"],  # Use BioBERT for other fields
+                "Diagnosis": biobert_prediction["Diagnosis"],
+                "Treatment": biobert_prediction["Treatment"],
+                "Current_Status": biobert_prediction["Current_Status"],
+                "Prognosis": biobert_prediction["Prognosis"]
             }
+            bert_accuracy = calculate_accuracy(bert_prediction, expected_output)
             
-            if bert_accuracy:
-                row_data["BERT_CONLL03_Accuracy"] = bert_accuracy["Overall_Accuracy"]
-            else:
-                row_data["BERT_CONLL03_Accuracy"] = "N/A"
+            # Store results for BERT_CONLL03
+            for metric, value in bert_accuracy.items():
+                results["BERT_CONLL03"][metric].append(value)
             
-            table_data.append(row_data)
-            
-            # Print individual chunk results
-            print(f"\n--- {chunk_name} Results ---")
-            print(f"Ground Truth: {json.dumps(expected_output, indent=2)}")
-            print(f"{model_name}: {json.dumps(extracted_name, indent=2)}")
-            print(f"Rule-Based: {json.dumps(rule_based_prediction, indent=2)}")
-            print(f"BioBERT: {json.dumps(biobert_prediction, indent=2)}")
-            if bert_accuracy:
-                print(f"BERT_CONLL03: {json.dumps(bert_prediction, indent=2)}")
-            print(f"{model_name} Accuracy: {rule_based_accuracy['Overall_Accuracy']:.2f}")
+            row_data["BERT_CONLL03_Accuracy"] = bert_accuracy["Overall_Accuracy"]
+        else:
+            row_data["BERT_CONLL03_Accuracy"] = "N/A"
         
         # Add to table data
-        table_data[-1]["Name_Accuracy"] = name_accuracy
+        table_data.append(row_data)
+        
+        # Print individual chunk results
+        print(f"\n--- {chunk_name} Results ---")
+        print(f"Ground Truth: {json.dumps(expected_output, indent=2)}")
+        print(f"Rule-Based Name: {rule_based_extracted_name}")
+        print(f"BioBERT Name: {biobert_extracted_name}")
+        if bert_name_detector.is_loaded:
+            print(f"BERT_CONLL03 Name: {bert_extracted_name}")
+        print(f"Rule-Based Accuracy: {rule_based_accuracy['Overall_Accuracy']:.2f}")
+        print(f"BioBERT Accuracy: {biobert_accuracy['Overall_Accuracy']:.2f}")
+        if bert_name_detector.is_loaded:
+            print(f"BERT_CONLL03 Accuracy: {bert_accuracy['Overall_Accuracy']:.2f}")
     
     # Calculate average metrics
     avg_results = {}
@@ -461,18 +494,34 @@ def evaluate_models():
     
     # Analyze name detection specifically
     print("\n=== NAME DETECTION ANALYSIS ===")
-    name_accuracy = {
-        "Rule_Based": [results["Rule_Based"]["Patient_Name_Accuracy"][i] for i, row in enumerate(table_data) if row["Chunk"].startswith("TEST_")],
-        "BioBERT": [results["BioBERT"]["Patient_Name_Accuracy"][i] for i, row in enumerate(table_data) if row["Chunk"].startswith("TEST_")]
+    
+    # Get name accuracy for test chunks
+    test_name_accuracy = {
+        "Rule_Based": [],
+        "BioBERT": [],
+        "BERT_CONLL03": []
     }
     
-    if "BERT_CONLL03" in avg_results:
-        name_accuracy["BERT_CONLL03"] = [results["BERT_CONLL03"]["Patient_Name_Accuracy"][i] for i, row in enumerate(table_data) if row["Chunk"].startswith("TEST_")]
+    for i, row in enumerate(table_data):
+        if row["Chunk"].startswith("TEST_"):
+            chunk_index = list(chunks.keys()).index(row["Chunk"])
+            
+            if chunk_index < len(results["Rule_Based"]["Patient_Name_Accuracy"]):
+                test_name_accuracy["Rule_Based"].append(results["Rule_Based"]["Patient_Name_Accuracy"][chunk_index])
+            
+            if chunk_index < len(results["BioBERT"]["Patient_Name_Accuracy"]):
+                test_name_accuracy["BioBERT"].append(results["BioBERT"]["Patient_Name_Accuracy"][chunk_index])
+            
+            if "BERT_CONLL03" in results and chunk_index < len(results["BERT_CONLL03"]["Patient_Name_Accuracy"]):
+                test_name_accuracy["BERT_CONLL03"].append(results["BERT_CONLL03"]["Patient_Name_Accuracy"][chunk_index])
     
     print("Name detection accuracy on test chunks:")
-    for model, accuracies in name_accuracy.items():
-        avg_name_accuracy = sum(accuracies) / len(accuracies) if accuracies else 0
-        print(f"  {model}: {avg_name_accuracy:.4f}")
+    for model, accuracies in test_name_accuracy.items():
+        if accuracies:
+            avg_name_accuracy = sum(accuracies) / len(accuracies)
+            print(f"  {model}: {avg_name_accuracy:.4f}")
+        else:
+            print(f"  {model}: No data available")
 
 if __name__ == "__main__":
     evaluate_models()

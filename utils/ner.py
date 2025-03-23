@@ -1,3 +1,4 @@
+# Rule-based NER model for extracting medical entities from a text.
 import re
 from collections import defaultdict
 from utils.name_detector import PersonNameDetector
@@ -428,3 +429,7 @@ class MedicalNER:
             text = text[0].upper() + text[1:]
         
         return text 
+    
+    def extract_name(self, text):
+        """Extract patient name from text"""
+        return self.name_detector.extract_name(text) 

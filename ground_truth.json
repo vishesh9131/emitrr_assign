@@ -1,0 +1,250 @@
+{
+  "CHUNK_A": {
+    "Patient_Name": null,
+    "Symptoms": ["Chest pain", "Pain spreading to left arm", "Shortness of breath", "Dizziness"],
+    "Diagnosis": "Possible angina",
+    "Treatment": ["ECG ordered", "Blood tests ordered", "Nitroglycerin tablets prescribed"],
+    "Current_Status": "Ongoing chest pain for two days",
+    "Prognosis": "Potentially serious but treatable"
+  },
+  "CHUNK_B": {
+    "Patient_Name": "Mark Thompson",
+    "Symptoms": ["Stomach pain", "Constipation", "Bloating", "Nausea"],
+    "Diagnosis": "Constipation due to diet and dehydration",
+    "Treatment": ["Increase fiber intake", "Drink more water", "Exercise regularly", "Possible laxative"],
+    "Current_Status": "Ongoing for four days",
+    "Prognosis": "Should improve within a few days with treatment"
+  },
+  "CHUNK_C": {
+    "Patient_Name": "Priya Sharma",
+    "Symptoms": ["Persistent cough", "Throat irritation", "Fatigue", "Occasional mucus"],
+    "Diagnosis": "Possible allergies or pollution-related irritation",
+    "Treatment": ["Cough syrup", "Antihistamine", "Avoid dust and smoke"],
+    "Current_Status": "Ongoing for two weeks",
+    "Prognosis": "Should improve with treatment, further tests if persists beyond a week"
+  },
+  "CHUNK_D": {
+    "Patient_Name": "Rajesh Kumar",
+    "Symptoms": ["Severe headache", "Weakness", "Slight fever", "Dizziness"],
+    "Diagnosis": "Possible migraine or dehydration-related headache",
+    "Treatment": ["Medication prescribed", "Increased fluid intake", "Rest"],
+    "Current_Status": "Started this morning",
+    "Prognosis": "Should improve with treatment, CT scan if persists"
+  },
+  "CHUNK_E": {
+    "Patient_Name": "Ananya Iyer",
+    "Symptoms": ["Fatigue", "Weakness", "Weight loss", "Dizziness"],
+    "Diagnosis": "Possible iron deficiency anemia",
+    "Treatment": ["Blood test recommended", "Iron supplements prescribed", "Iron-rich diet"],
+    "Current_Status": "Ongoing for a few weeks",
+    "Prognosis": "Should improve within a few weeks with treatment"
+  },
+  "CHUNK_F": {
+    "Patient_Name": "Suresh Patel",
+    "Symptoms": ["Burning sensation while urinating", "Dark urine", "Strong urine odor", "Lower abdominal soreness"],
+    "Diagnosis": "Urinary tract infection (UTI)",
+    "Treatment": ["Antibiotics prescribed", "Increased water intake"],
+    "Current_Status": "Ongoing for three days",
+    "Prognosis": "Should improve with antibiotics, further tests if no improvement"
+  },
+  "CHUNK_G": {
+    "Patient_Name": "Kavita Mehta",
+    "Symptoms": ["Knee pain", "Pain worse when walking or climbing stairs"],
+    "Diagnosis": "Possible early arthritis or strain from prolonged standing",
+    "Treatment": ["Pain relief medication", "Physiotherapy recommended"],
+    "Current_Status": "Ongoing for a few months",
+    "Prognosis": "X-ray or MRI if pain persists despite treatment"
+  },
+  "CHUNK_H": {
+    "Patient_Name": null,
+    "Symptoms": ["Neck pain", "Back pain"],
+    "Diagnosis": null,
+    "Treatment": ["Physiotherapy (completed ten sessions)"],
+    "Current_Status": "Improved, occasional back pain only",
+    "Prognosis": null
+  },
+  "CHUNK_I": {
+    "Patient_Name": "Vishesh",
+    "Symptoms": ["Neck pain", "Back pain"],
+    "Diagnosis": null,
+    "Treatment": ["Physiotherapy (completed ten sessions)"],
+    "Current_Status": "Improved, occasional back pain only",
+    "Prognosis": null
+  },
+  "CHUNK_J": {
+    "Patient_Name": "O'Brien-Smith",
+    "Symptoms": ["Lower back pain", "Discomfort when bending"],
+    "Diagnosis": null,
+    "Treatment": ["Exercise regimen", "Continuation of current treatment plan"],
+    "Current_Status": "Improving",
+    "Prognosis": "Expected continued improvement with treatment"
+  },
+  "CHUNK_K": {
+    "Patient_Name": "Sarah Johnson",
+    "Symptoms": ["Severe migraines"],
+    "Diagnosis": "Pending tests",
+    "Treatment": ["Tests to be run", "Pain medication prescribed"],
+    "Current_Status": "Ongoing for past month, occurring daily",
+    "Prognosis": "Affecting ability to work, requires further investigation"
+  },
+  "CHUNK_L": {
+    "Patient_Name": "David Williams",
+    "Symptoms": ["Insomnia", "Difficulty falling asleep"],
+    "Diagnosis": "Possible stress-induced insomnia",
+    "Treatment": ["Sleep hygiene techniques", "Possible short-term medication"],
+    "Current_Status": "Ongoing for three weeks",
+    "Prognosis": "Likely related to work pressure"
+  },
+  "CHUNK_M": {
+    "Patient_Name": "Michael Chen",
+    "Symptoms": ["Shortness of breath during exercise"],
+    "Diagnosis": "Pending examination",
+    "Treatment": ["Lung and heart function tests planned"],
+    "Current_Status": "Ongoing for two weeks",
+    "Prognosis": "New symptom requiring investigation"
+  },
+  "CHUNK_N": {
+    "Patient_Name": "Elizabeth Taylor (Liz)",
+    "Symptoms": ["Joint pain", "Pain worse in the morning"],
+    "Diagnosis": "Possible rheumatoid arthritis",
+    "Treatment": ["Tests to confirm diagnosis"],
+    "Current_Status": "Ongoing for six months, worsening in recent weeks",
+    "Prognosis": "Requires confirmation through testing"
+  },
+  "CHUNK_O": {
+    "Patient_Name": "Robert De Niro",
+    "Symptoms": ["Slight occasional headache", "Previous sinus infection"],
+    "Diagnosis": "Recovering sinus infection",
+    "Treatment": ["Continue antibiotics until finished"],
+    "Current_Status": "Improving, mostly recovered",
+    "Prognosis": "Complete resolution expected within days"
+  },
+  "CHUNK_P": {
+    "Patient_Name": "Maria Garcia-Rodriguez",
+    "Symptoms": ["Heart palpitations"],
+    "Diagnosis": "Pending ECG",
+    "Treatment": ["ECG planned"],
+    "Current_Status": "Ongoing for two weeks, occurring randomly throughout the day",
+    "Prognosis": "Requires investigation"
+  },
+  "CHUNK_Q": {
+    "Patient_Name": "Anil Patel",
+    "Symptoms": ["Lower back pain", "Sharp shooting pain radiating down left leg", "Numbness and tingling in foot", "Difficulty sleeping"],
+    "Diagnosis": "Possible sciatica or herniated disc",
+    "Treatment": ["MRI ordered", "Muscle relaxant prescribed", "Anti-inflammatory medication prescribed"],
+    "Current_Status": "Worsening over past three months",
+    "Prognosis": "Expected improvement within 2-3 weeks with treatment, possible epidural steroid injections if significant herniation"
+  },
+  "CHUNK_R": {
+    "Patient_Name": "Serious Lee-Wong",
+    "Symptoms": ["Recurring headaches", "Throbbing pain", "Flashing lights", "Nausea", "Vomiting", "Light sensitivity", "Blurry vision"],
+    "Diagnosis": "Likely migraine with aura",
+    "Treatment": ["Brain MRI ordered", "Triptan medication prescribed", "Headache diary recommended"],
+    "Current_Status": "Ongoing for six weeks, lasting hours to a day",
+    "Prognosis": "Likely chronic but manageable with proper treatment"
+  },
+  "CHUNK_S": {
+    "Patient_Name": "Angina Pectoris",
+    "Symptoms": ["Chest discomfort", "Pressure/squeezing in chest", "Shortness of breath", "Symptoms occur with exertion, resolve with rest"],
+    "Diagnosis": "Possible coronary artery disease/angina pectoris",
+    "Treatment": ["ECG planned", "Stress test scheduled", "Nitroglycerin tablets prescribed"],
+    "Current_Status": "Ongoing for one week",
+    "Prognosis": "Potentially serious, treatment options range from medication to surgery depending on severity"
+  },
+  "CHUNK_T": {
+    "Patient_Name": "Thompson",
+    "Symptoms": ["Fatigue", "Dizziness", "Headaches", "Weight loss", "Unusual bruising", "Decreased appetite"],
+    "Diagnosis": "Multiple possibilities including anemia, vitamin deficiencies, diabetes, thyroid issues, or bone marrow disorders",
+    "Treatment": ["Full blood panel ordered", "CBC, iron levels, vitamin B12, thyroid function tests"],
+    "Current_Status": "Worsening over months",
+    "Prognosis": "Depends on test results, could range from simple deficiency to more serious conditions"
+  },
+  "CHUNK_U": {
+    "Patient_Name": "Sam",
+    "Symptoms": ["Muscle twitching", "Muscle weakness in left leg", "Word-finding difficulties", "Coordination issues", "Handwriting changes"],
+    "Diagnosis": "Possible neurological condition - differential includes vitamin deficiencies, stress-related muscle spasms, ALS, MS, or early-onset Parkinson's",
+    "Treatment": ["Blood tests planned", "EMG recommended", "MRI scan ordered"],
+    "Current_Status": "Progressing over a few months",
+    "Prognosis": "Depends on test results, early intervention important"
+  },
+  "TEST_CHUNK_A": {
+    "Patient_Name": "John Smith",
+    "Symptoms": ["Severe lower back pain", "Pain worse when bending or sitting"],
+    "Diagnosis": "Muscle strain",
+    "Treatment": ["Anti-inflammatory medication", "Rest"],
+    "Current_Status": "Ongoing for one week",
+    "Prognosis": "Expected improvement within 3-5 days with treatment"
+  },
+  "TEST_CHUNK_B": {
+    "Patient_Name": "Jennifer Lopez-Garcia",
+    "Symptoms": ["Migraines", "Flashing lights", "Nausea"],
+    "Diagnosis": "Migraine with aura",
+    "Treatment": ["Medication prescribed", "Headache diary recommended"],
+    "Current_Status": "Ongoing for three months, increasing in frequency",
+    "Prognosis": "Manageable with proper treatment"
+  },
+  "TEST_CHUNK_C": {
+    "Patient_Name": "James O'Connor",
+    "Symptoms": ["Chest pains", "Pain associated with stress"],
+    "Diagnosis": "Pending tests",
+    "Treatment": ["Tests ordered"],
+    "Current_Status": "Ongoing for two weeks, intermittent",
+    "Prognosis": "Requires investigation due to family history"
+  },
+  "TEST_CHUNK_D": {
+    "Patient_Name": "Kim Lee-Wong",
+    "Symptoms": ["Sore throat", "Pain when swallowing", "Low fever"],
+    "Diagnosis": "Strep throat",
+    "Treatment": ["Antibiotics prescribed"],
+    "Current_Status": "Ongoing for five days",
+    "Prognosis": "Expected improvement within 48 hours of treatment"
+  },
+  "TEST_CHUNK_E": {
+    "Patient_Name": "Thomas O'Reilly-Johnson",
+    "Symptoms": ["Extreme fatigue", "Increased thirst"],
+    "Diagnosis": "Pending blood tests",
+    "Treatment": ["Blood tests ordered"],
+    "Current_Status": "Ongoing for one month",
+    "Prognosis": "Depends on test results"
+  },
+  "TEST_CHUNK_F": {
+    "Patient_Name": "Abdul al-Farsi",
+    "Symptoms": ["Persistent cough", "Worse at night and morning", "Yellow phlegm"],
+    "Diagnosis": "Bronchitis",
+    "Treatment": ["Antibiotics prescribed", "Increased fluid intake", "Rest"],
+    "Current_Status": "Ongoing for three weeks",
+    "Prognosis": "Expected improvement with treatment"
+  },
+  "TEST_CHUNK_G": {
+    "Patient_Name": "Mary-Kate Williams",
+    "Symptoms": ["Severe joint pain in hands", "Morning stiffness", "Swollen fingers"],
+    "Diagnosis": "Possible rheumatoid arthritis",
+    "Treatment": ["Blood tests ordered"],
+    "Current_Status": "Ongoing for several months, worsening",
+    "Prognosis": "Manageable with treatment if confirmed"
+  },
+  "TEST_CHUNK_H": {
+    "Patient_Name": "Jean-Claude Van Damme",
+    "Symptoms": ["Dizzy spells", "Room spinning sensation", "Ear fullness", "Ringing in ears"],
+    "Diagnosis": "Possible vertigo due to inner ear issue",
+    "Treatment": ["Tests ordered"],
+    "Current_Status": "Ongoing for one week",
+    "Prognosis": "Depends on underlying cause"
+  },
+  "TEST_CHUNK_I": {
+    "Patient_Name": "D'Angelo Washington",
+    "Symptoms": ["Insomnia", "Difficulty falling asleep", "Multiple night awakenings"],
+    "Diagnosis": "Insomnia related to disrupted sleep schedule",
+    "Treatment": ["Sleep hygiene techniques", "Possible short-term sleep aid"],
+    "Current_Status": "Ongoing for weeks",
+    "Prognosis": "Likely to improve with regular sleep schedule"
+  },
+  "TEST_CHUNK_J": {
+    "Patient_Name": "Sarah O'Malley-Jenkins",
+    "Symptoms": ["Numbness in right hand", "Affects thumb and first two fingers"],
+    "Diagnosis": "Possible carpal tunnel syndrome",
+    "Treatment": ["Tests to confirm", "Ergonomic changes recommended", "Possible wrist brace"],
+    "Current_Status": "Ongoing for two weeks",
+    "Prognosis": "Manageable with proper ergonomics and treatment"
+  }
+}

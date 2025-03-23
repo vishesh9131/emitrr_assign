@@ -64,24 +64,25 @@ class BERTNameDetector:
             "true", "false", "good", "bad", "better", "worse", "best", "worst"
         ]
 
+        self.load_model()  # Load the model during initialization
+
     def load_model(self):
-        """Load the model only when needed"""
-        if not self.is_loaded:
-            try:
-                print("Loading BERT NER model... This may take a moment.")
-                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-                self.model = AutoModelForTokenClassification.from_pretrained(self.model_name)
-                self.is_loaded = True
-                
-                # Get the label map from the model config
-                self.id2label = self.model.config.id2label
-                
-                print("BERT NER model loaded successfully.")
-                return True
-            except Exception as e:
-                print(f"Error loading BERT NER model: {str(e)}")
-                return False
-        return True
+        """Load the BERT model for NER"""
+        try:
+            # Load pre-trained model and tokenizer
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            self.model = AutoModelForTokenClassification.from_pretrained(self.model_name)
+            self.is_loaded = True
+            
+            # Get the label map from the model config
+            self.id2label = self.model.config.id2label
+            
+            print("BERT NER model loaded successfully.")
+            return True
+        except Exception as e:
+            print(f"Error loading BERT model: {str(e)}")
+            self.is_loaded = False
+            return False
 
     def extract_name(self, text):
         """Extract patient name from medical conversation text"""

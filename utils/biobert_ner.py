@@ -298,3 +298,13 @@ class BioBERTNER:
         text = text.replace("Ecg", "ECG").replace("Ekg", "EKG").replace("Mri", "MRI").replace("Ct", "CT")
         
         return text
+
+    def extract_name(self, text):
+        """Extract person name from text using the name detector"""
+        # Check for special case names first
+        for name, full_name in self.specific_names.items():
+            if name in text:
+                return full_name
+        
+        # Use the name detector to extract the name
+        return self.name_detector.extract_name(text)
