@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "physician-notetaker"
+version = "0.1.0"
+description = "Medical NLP system for transcription, summarization, and sentiment analysis"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Physician Notetaker Team"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps."
+]
+dependencies = [
+    "torch==2.1.2",
+    "transformers==4.30.2",
+    "nltk==3.8.1",
+    "spacy==3.5.3",
+    "scikit-learn==1.2.2",
+    "pandas==2.0.2",
+    "regex==2023.6.3",
+    "numpy",
+    "pillow",
+    "streamlit>=1.22.0",
+    "huggingface-hub>=0.16.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+]
+
+[tool.setuptools]
+packages = ["utils"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.streamlit]
+server.port = 8501
+server.headless = true
+theme.primaryColor = "#3498db"
+theme.backgroundColor = "#ffffff"
+theme.secondaryBackgroundColor = "#f0f2f6"
+theme.textColor = "#262730"
+theme.font = "sans serif" 

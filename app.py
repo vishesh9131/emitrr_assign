@@ -9,6 +9,7 @@ from transcript import *
 from utils.sentiment_analyzer import MedicalSentimentAnalyzer
 from utils.soap_generator import SOAPNoteGenerator
 from utils.biobert_finetuned import FineTunedBioBERTNER
+from utils.model_cache import download_models
 
 # Set page config with expanded layout
 st.set_page_config(
@@ -45,6 +46,10 @@ st.markdown("""
     header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
+
+# Before loading models
+with st.spinner("Setting up models (first run may take a few minutes)..."):
+    download_models()
 
 # Initialize models
 @st.cache_resource
