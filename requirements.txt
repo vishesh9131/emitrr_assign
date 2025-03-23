@@ -7,4 +7,5 @@ pandas==2.0.2
 regex==2023.6.3
 numpy
 pillow
-streamlit
+streamlit==1.32.0  # Using a specific version known to work with Python 3.9
+huggingface-hub>=0.16.4 

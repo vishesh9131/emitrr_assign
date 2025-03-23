@@ -7,7 +7,7 @@ name = "physician-notetaker"
 version = "0.1.0"
 description = "Medical NLP system for transcription, summarization, and sentiment analysis"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9,!=3.9.7,<3.12"
 license = {text = "MIT"}
 authors = [
     {name = "Physician Notetaker Team"}
@@ -29,7 +29,7 @@ dependencies = [
     "regex==2023.6.3",
     "numpy",
     "pillow",
-    "streamlit>=1.22.0",
+    "streamlit>=1.22.0,!=1.40.2,!=1.41.0,!=1.41.1,!=1.42.0,!=1.42.1,!=1.42.2,!=1.43.0,!=1.43.1,!=1.43.2",
     "huggingface-hub>=0.16.4",
 ]
 
