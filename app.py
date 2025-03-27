@@ -1,5 +1,13 @@
 import streamlit as st
 import json
+import os
+import sys
+
+# Prevent Streamlit from watching torch modules
+if hasattr(st, '_is_running_with_streamlit'):
+    import torch
+    sys.modules['torch._classes'] = None
+
 from utils.ner import MedicalNER
 from utils.biobert_ner import BioBERTNER
 from utils.summarization import MedicalSummarizer
