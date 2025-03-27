@@ -90,6 +90,7 @@ The following images provide a step-by-step guide on how to use the app:
 
 1. Home Screen: Left portion is controls and right is Resutl Display Area.
    ![User Login](./assets/images/2.png)
+Deployed (link) : [click here](https://emitrrassign-mlpc9e3psnujjrrzpsmetz.streamlit.app/#select-ner-method)
 
 2. Sampe Conversation: Can test using smaple converstations
    ![Dashboard](./assets/images/3.png)
